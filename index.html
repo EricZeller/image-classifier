@@ -39,6 +39,29 @@
     .result {
       margin-top: 20px;
     }
+
+    #results {
+      font-size: 18px;
+      padding: 20px;
+      border: 1px solid #d1d1d1;
+      border-radius: 5px;
+      width: 300px;
+      background-color: #fff;
+    }
+
+    #results ol {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #results li {
+      padding: 10px 0;
+      border-bottom: 1px solid #e1e1e1;
+    }
+
+    #results li:last-child {
+      border-bottom: none;
+    }
   </style>
 </head>
 
@@ -51,11 +74,11 @@
     <p>Bitte lade ein Bild hoch, damit es klassifiziert wird:</p>
     <input type="file" id="imageUpload" accept="image/*">
     <div>
-      <button id="classifyButton" >Klassifizieren</button>
+      <button id="classifyButton">Klassifizieren</button>
     </div>
     <div class="result">
-      <h4>Ergebnis:</h4>
-      <p id="classificationResult">Noch nicht klassifiziert</p>
+      <h4>Ergebnis, mit Prozentwahrscheinlichkeit:</h4>
+      <div id="results"></div>
     </div>
   </div>
 
@@ -98,9 +121,25 @@
         model.classify(imageTensor).then(predictions => {
           console.log('Predictions: ');
           console.log(predictions);
-          document.getElementById("classificationResult").innerHTML = predictions[0].className + ", " + predictions[1].className + ", " + predictions[2].className;
+          displayResults(predictions);
         });
       });
+    }
+
+    function displayResults(predictions) {
+      const resultsDiv = document.getElementById('results');
+      let htmlContent = '<ol>';
+
+      predictions.forEach(prediction => {
+        htmlContent += `
+            <li>
+                ${prediction.className}: ${(prediction.probability * 100).toFixed(2)}%
+            </li>
+        `;
+      });
+
+      htmlContent += '</ol>';
+      resultsDiv.innerHTML = htmlContent;
     }
 
   </script>
