@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bildklassifikation mit TensorFlow.js</title>
+  <title>Image Classifier by Eric</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -133,7 +133,7 @@
       predictions.forEach(prediction => {
         htmlContent += `
             <li>
-                ${prediction.className}: ${(prediction.probability * 100).toFixed(2)}%
+                ${prediction.className}: ${(prediction.probability * 100).toFixed(1)}%
             </li>
         `;
       });
