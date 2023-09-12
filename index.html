@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bildklassifikation mit TensorFlow.js</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff;
+    }
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <img id="uploadedImage" style="display:none;" crossorigin="anonymous">
+
+  <div class="container">
+    <h2>Bildklassifikation</h2>
+    <p>Bitte lade ein Bild hoch, damit es klassifiziert wird:</p>
+    <input type="file" id="imageUpload" accept="image/*">
+    <div>
+      <button id="classifyButton" onclick="classifyImage()">Klassifizieren</button>
+    </div>
+    <div class="result">
+      <h4>Ergebnis:</h4>
+      <p id="classificationResult">Noch nicht klassifiziert</p>
+    </div>
+  </div>
+
+  <!-- Load TensorFlow.js. This is required to use MobileNet. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.1"> </script>
+  <!-- Load the MobileNet model. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
+
+  <script>
+
+    let uploadedImage;
+    let isImageLoaded = false;
+
+    document.getElementById('imageUpload').addEventListener('change', function (event) {
+      const inputElement = event.target;
+      if (inputElement.files && inputElement.files[0]) {
+        uploadedImage = new Image();
+        uploadedImage.onload = function () {
+          isImageLoaded = true; // Setzen Sie den Status auf "geladen", wenn das Bild geladen ist
+        };
+        uploadedImage.src = URL.createObjectURL(inputElement.files[0]);
+      }
+    });
+
+    document.getElementById('classifyButton').addEventListener('click', function () {
+      if (uploadedImage && isImageLoaded) {
+        classifyImage(uploadedImage);
+      } else {
+        alert("Bitte warten, bis das Bild vollständig geladen ist oder lade zuerst ein Bild hoch");
+      }
+    });
+
+    function classifyImage(imgElement) {
+      // Verwenden Sie das Bild mit TensorFlow.js
+      const imageTensor = tf.browser.fromPixels(imgElement);
+      // ... Ihr Code zur Klassifizierung des Bildes ...
+
+      mobilenet.load().then(model => {
+        // Classify the image.
+        model.classify(imageTensor).then(predictions => {
+          console.log('Predictions: ');
+          console.log(predictions);
+          document.getElementById("classificationResult").innerHTML = predictions[0].className + ", " + predictions[1].className + ", " + predictions[2].className;
+        });
+      });
+    }
+
+  </script>
+
+
+</body>
+
+</html>
