@@ -84,9 +84,9 @@
   </div>
 
   <!-- Load TensorFlow.js. This is required to use MobileNet. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.1"> </script>
   <!-- Load the MobileNet model. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
 
   <script>
 
@@ -117,9 +117,9 @@
       const imageTensor = tf.browser.fromPixels(imgElement);
       // ... Ihr Code zur Klassifizierung des Bildes ...
 
-      cocoSsd.load().then(model => {
+      mobilenet.load().then(model => {
         // Classify the image.
-        model.detect(imageTensor).then(predictions => {
+        model.classify(imageTensor).then(predictions => {
           console.log('Predictions: ');
           console.log(predictions);
           displayResults(predictions);
