@@ -14,14 +14,15 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background-color: #f5f5f5;
+      background-color: #222;
+      color: #ccc;
     }
 
     .container {
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
-      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      background-color: #333;
     }
 
     input[type="file"] {
@@ -44,10 +45,10 @@
     #results {
       font-size: 18px;
       padding: 20px;
-      border: 1px solid #d1d1d1;
+      border: 1px solid #323232;
       border-radius: 5px;
       width: 300px;
-      background-color: #fff;
+      background-color: #222;
     }
 
     #results ol {
@@ -83,10 +84,10 @@
     </div>
   </div>
 
-  <!-- Load TensorFlow.js. This is required to use MobileNet. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.1"> </script>
-  <!-- Load the MobileNet model. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
+  <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+  <!-- Load the coco-ssd model. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
 
   <script>
 
@@ -117,17 +118,53 @@
       const imageTensor = tf.browser.fromPixels(imgElement);
       // ... Ihr Code zur Klassifizierung des Bildes ...
 
-      mobilenet.load().then(model => {
+      /*mobilenet.load().then(model => {
         // Classify the image.
         model.classify(imageTensor).then(predictions => {
           console.log('Predictions: ');
           console.log(predictions);
           displayResults(predictions);
         });
+      });*/
+      cocoSsd.load().then(model => {
+        // detect objects in the image.
+        model.detect(imageTensor).then(predictions => {
+          console.log('Predictions: ', predictions);
+          drawBoundingBoxes(imgElement, predictions, window.innerWidth);
+        });
       });
     }
 
-    function displayResults(predictions) {
+    function drawBoundingBoxes(imageElement, detections, maxWidth) {
+    const aspectRatio = imageElement.width / imageElement.height;
+
+    const canvasWidth = Math.min(maxWidth, imageElement.width); // Beschränken Sie die Breite auf maxWidth oder die Bildbreite, je nachdem, welcher Wert kleiner ist.
+    const canvasHeight = canvasWidth / aspectRatio;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    
+    // Zeichnen Sie das Bild skaliert auf das Canvas
+    ctx.drawImage(imageElement, 0, 0, canvasWidth, canvasHeight);
+
+    detections.forEach(detection => {
+        const [x, y, width, height] = detection.bbox.map(val => val * (canvasWidth / imageElement.width));  // Skalieren der Bounding Box gemäß der neuen Canvas-Größe
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x, y, width, height);
+
+        const text = `${detection.class} ${(detection.score * 100).toFixed(1)}%`;
+        ctx.fillStyle = 'red';
+        ctx.font = '20px Arial';
+        ctx.fillText(text, x, y > 20 ? y - 5 : y + 25);
+    });
+
+    document.body.appendChild(canvas);
+}
+
+    /*function displayResults(predictions) {
       const resultsDiv = document.getElementById('results');
       let htmlContent = '<ol>';
 
@@ -141,7 +178,7 @@
 
       htmlContent += '</ol>';
       resultsDiv.innerHTML = htmlContent;
-    }
+    }*/
 
   </script>
 
