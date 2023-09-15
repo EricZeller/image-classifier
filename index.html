@@ -77,6 +77,7 @@
     <input type="file" id="imageUpload" accept="image/*">
     <div>
       <button id="classifyButton">Klassifizieren</button>
+      <button id="objectsButton">Klassifizieren</button>
     </div>
     <div class="result">
       <h4>Ergebnis, mit Wahrscheinlichkeit:</h4>
@@ -136,20 +137,20 @@
     }
 
     function drawBoundingBoxes(imageElement, detections, maxWidth) {
-    const aspectRatio = imageElement.width / imageElement.height;
+      const aspectRatio = imageElement.width / imageElement.height;
 
-    const canvasWidth = Math.min(maxWidth, imageElement.width); // Beschränken Sie die Breite auf maxWidth oder die Bildbreite, je nachdem, welcher Wert kleiner ist.
-    const canvasHeight = canvasWidth / aspectRatio;
+      const canvasWidth = Math.min(maxWidth, imageElement.width); // Beschränken Sie die Breite auf maxWidth oder die Bildbreite, je nachdem, welcher Wert kleiner ist.
+      const canvasHeight = canvasWidth / aspectRatio;
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    
-    // Zeichnen Sie das Bild skaliert auf das Canvas
-    ctx.drawImage(imageElement, 0, 0, canvasWidth, canvasHeight);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
 
-    detections.forEach(detection => {
+      // Zeichnen Sie das Bild skaliert auf das Canvas
+      ctx.drawImage(imageElement, 0, 0, canvasWidth, canvasHeight);
+
+      detections.forEach(detection => {
         const [x, y, width, height] = detection.bbox.map(val => val * (canvasWidth / imageElement.width));  // Skalieren der Bounding Box gemäß der neuen Canvas-Größe
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 4;
@@ -159,10 +160,10 @@
         ctx.fillStyle = 'red';
         ctx.font = '20px Arial';
         ctx.fillText(text, x, y > 20 ? y - 5 : y + 25);
-    });
+      });
 
-    document.body.appendChild(canvas);
-}
+      document.body.appendChild(canvas);
+    }
 
     /*function displayResults(predictions) {
       const resultsDiv = document.getElementById('results');
